@@ -3,14 +3,17 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   base: './',
-  build: { target: 'es2022' },
+  build: { target: 'es2022', chunkSizeWarningLimit: 1500 },
+  worker: { format: 'es' },
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['opencv.js', 'icon.svg'],
+      includeAssets: ['opencv.js', 'icon.svg', 'ort/*'],
       workbox: {
         maximumFileSizeToCacheInBytes: 30 * 1024 * 1024,
-        globPatterns: ['**/*.{js,css,html,svg,png,wasm}'],
+        globPatterns: ['**/*.{js,mjs,css,html,svg,png,wasm}'],
+        // Le moteur ONNX est servi depuis ort/ : la copie que Vite place dans assets/ ne sert pas.
+        globIgnores: ['assets/ort-wasm*'],
         navigateFallback: 'index.html',
       },
       manifest: {
@@ -21,9 +24,9 @@ export default defineConfig({
         start_url: './',
         scope: './',
         display: 'standalone',
-        orientation: 'any',
-        background_color: '#12151c',
-        theme_color: '#12151c',
+        orientation: 'portrait',
+        background_color: '#15130f',
+        theme_color: '#15130f',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
